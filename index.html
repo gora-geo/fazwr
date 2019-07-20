@@ -2,7 +2,7 @@
 <html lang="en"> 
 <head> 
     <meta charset="UTF-8" />
-    <title>Making your first Phaser 3 Game - Part 6</title>
+    <title>Making your first Phaser 3 Game - Part 7</title>
     <script src="//cdn.jsdelivr.net/npm/phaser@3.11.0/dist/phaser.js"></script>
     <style type="text/css">
         body {
@@ -18,7 +18,7 @@
         type: Phaser.AUTO,
         width: 800,
         height: 600,
-        physics: { /* подключение Arcade Physics, поддержку физики*/
+        physics: {  /* подключение Arcade Physics, поддержку физики*/
             default: 'arcade',
             arcade: {
                 gravity: { y: 300 },
@@ -34,6 +34,7 @@
 
     var player;
     var platforms;
+    var cursors;
 
     var game = new Phaser.Game(config);
 
@@ -51,7 +52,7 @@
     {
         this.add.image(400, 300, 'sky');
 
-        /*создаем размешаем фон координаты указаны по центру но можно по верхенму левому --
+         /*создаем размешаем фон координаты указаны по центру но можно по верхенму левому --
         this.add.image(0, 0, 'sky').setOrigin(0, 0)*/
 
         platforms = this.physics.add.staticGroup();
@@ -65,7 +66,7 @@
 
         platforms.create(400, 568, 'ground').setScale(2).refreshBody();
 
-         /*добовляем платформу и маштабируем в 2 раза refreshBody - сообщает что она смаштабирована*/
+        /*добовляем платформу и маштабируем в 2 раза refreshBody - сообщает что она смаштабирована*/
 
         platforms.create(600, 400, 'ground');
 
@@ -85,7 +86,6 @@
         После создания спрайта ему присваивается небольшое значение отказов 0,2. Это означает, что когда он приземлится после прыжка, он будет слегка подпрыгивать. 
 
         */
-
         player.setCollideWorldBounds(true);
 
         /*
@@ -119,9 +119,17 @@
             repeat: -1
         });
 
-        this.physics.add.collider(player, platforms);
+        cursors = this.input.keyboard.createCursorKeys();
 
         /*
+        Это заполняет объект курсора четырьмя свойствами: вверх, вниз, влево, вправо, которые являются экземплярами объектов Key. 
+         Тогда все, что нам нужно сделать, это опросить их в нашем updateцикле:
+
+        */
+
+        this.physics.add.collider(player, platforms);
+
+         /*
         Чтобы позволить игроку сталкиваться с платформами, мы можем создать объект Collider. Этот объект контролирует два физических объекта (которые могут включать в себя группы) и проверяет наличие коллизий или совпадений между ними.
         Коллайдер - тот, кто выполняет магию. Он берет два объекта и тесты на столкновение и выполняет разделение против них. В этом случае мы даем ему спрайт игрока и группу платформ. Это достаточно умно, чтобы запустить столкновение со всеми членами группы, так что этот один вызов столкнется с землей и всеми платформами. В результате получается устойчивая платформа, которая не рушится:
         */
@@ -129,6 +137,32 @@
 
     function update ()
     {
+        if (cursors.left.isDown)  
+        {
+            player.setVelocityX(-160);
+
+            player.anims.play('left', true);
+
+            /*Первое, что он делает, это проверяет, удерживается ли левая клавиша. Если это так, мы применяем отрицательную горизонтальную скорость и запускаем «левую» анимацию бега.*/
+        }
+        else if (cursors.right.isDown)
+        {
+            player.setVelocityX(160);
+
+            player.anims.play('right', true);
+        }
+        else
+        {
+            player.setVelocityX(0);
+
+            player.anims.play('turn');
+        }
+
+        if (cursors.up.isDown && player.body.touching.down)
+        {
+            player.setVelocityY(-330);
+            /*прыжок вверх*/
+        }
     }
 
 </script>
